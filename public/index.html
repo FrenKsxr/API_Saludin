@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pill Reminder</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    .alarm { margin: 10px 0; }
+    button { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Pill Reminder</h1>
+  
+  <h2>Add Alarm</h2>
+  <form id="alarmForm">
+    <input type="number" id="hour" min="0" max="23" placeholder="Hour" required>
+    <input type="number" id="minute" min="0" max="59" placeholder="Minute" required>
+    <input type="text" id="name" maxlength="19" placeholder="Pill Name" required>
+    <button type="submit">Add Alarm</button>
+  </form>
+
+  <h2>Current Alarms</h2>
+  <div id="alarms"></div>
+
+  <script>
+    const credentials = btoa('admin:pill1234');
+    
+    function fetchAlarms() {
+      fetch('/api/alarms')
+        .then(res => res.json())
+        .then(alarms => {
+          const div = document.getElementById('alarms');
+          div.innerHTML = alarms.map(a => `
+            <div class="alarm">
+              ${a.hour}:${a.minute < 10 ? '0' + a.minute : a.minute} - ${a.name}
+              <input type="checkbox" ${a.active ? 'checked' : ''} 
+                onchange="toggleAlarm(${a.id}, this.checked)">
+              <button onclick="deleteAlarm(${a.id})">Delete</button>
+            </div>
+          `).join('');
+        });
+    }
+
+    document.getElementById('alarmForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const alarm = {
+        hour: parseInt(document.getElementById('hour').value),
+        minute: parseInt(document.getElementById('minute').value),
+        name: document.getElementById('name').value,
+        active: true
+      };
+      
+      fetch('/api/alarms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${credentials}` },
+        body: JSON.stringify(alarm)
+      }).then(() => {
+        fetchAlarms();
+        e.target.reset();
+      });
+    });
+
+    function toggleAlarm(id, active) {
+      fetch(`/api/alarms/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${credentials}` },
+        body: JSON.stringify({ active })
+      }).then(fetchAlarms);
+    }
+
+    function deleteAlarm(id) {
+      if (confirm(' ¿Estás seguro de eliminar esta alarma?')) {
+        fetch(`/api/alarms/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Basic ${credentials}` }
+        }).then(fetchAlarms);
+      }
+    }
+
+    fetchAlarms();
+    setInterval(fetchAlarms, 5000);
+  </script>
+</body>
+</html>
