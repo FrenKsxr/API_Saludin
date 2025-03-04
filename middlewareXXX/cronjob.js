@@ -64,7 +64,7 @@ cron.schedule('* * * * *', () => { // A las 8:30 AM
 console.log('⏰ Cron job de alarmas activado...');
 */
 
-
+/*apidpsiadiasdipsadad
 const { sendWhatsAppMessage } = require('./whasa');
 const cron = require('node-cron');
 const alarmsService = require('../service/alarmsService'); // Importar el servicio para obtener las alarmas
@@ -86,9 +86,55 @@ cron.schedule('* * * * *', async () => { // Cada minuto
         // Compara si la hora y el minuto de la alarma coinciden con la hora actual
         if (alarm.active === 1 && alarm.hour === currentHour && alarm.minute === currentMinute) {
             // Enviar mensaje de WhatsApp si la hora y minuto coinciden
-            sendWhatsAppMessage('526622247422@c.us', `¡Es hora de tomar tu pastilla! 💊 - ${alarm.name}`);
+            sendWhatsAppMessage('529141322309@c.us', `¡Es hora de tomar tu pastilla! 💊 - ${alarm.name}`);
         }
     });
 });
 
 console.log('⏰ Cron job de alarmas activado...');
+*/
+
+/*/*//////*/*/*/*/*/*/*/*/
+
+const { sendWhatsAppMessage } = require('./whasa');
+const cron = require('node-cron');
+const alarmsService = require('../service/alarmsService');
+
+const alarmService = new alarmsService();
+
+// Programar el cron job cada minuto para revisar alarmas activas
+cron.schedule('* * * * *', async () => {
+    const currentTime = new Date(); // Obtener la hora actual
+    const alarms = await alarmService.obtenerAlarm(); // Obtener todas las alarmas activas
+
+    alarms.forEach(async (alarm) => {
+        if (alarm.active === 1) {
+            const startDate = new Date(alarm.fecha_inicio);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + alarm.dias); // Sumar los días de duración
+
+            const now = new Date();
+
+            // Si la fecha actual supera el tiempo de tratamiento, se desactiva la alarma
+            if (now >= endDate) {
+                await alarmService.actualizarAlarm(alarm.id, { active: 0 });
+                console.log(`⏳ Alarma ${alarm.name} desactivada automáticamente.`);
+                return; // Salir de la función para evitar el envío de mensaje
+            }
+
+            // Convertir frecuencia a minutos
+            const frecuenciaMinutos = alarm.frecuencia; // Asume que la frecuencia ya viene en minutos
+
+            // Calcular si es el momento correcto para enviar el mensaje
+            const diffMinutes = Math.floor((now - startDate) / (1000 * 60)); // Diferencia en minutos desde el inicio
+
+            if (diffMinutes % frecuenciaMinutos === 0) {
+                sendWhatsAppMessage('529141322309@c.us', `¡Es hora de tomar tu pastilla! 💊 - ${alarm.name}`);
+                console.log(`📩 Mensaje enviado para la alarma: ${alarm.name}`);
+            }
+        }
+    });
+});
+
+console.log('⏰ Cron job de alarmas activado...');
+

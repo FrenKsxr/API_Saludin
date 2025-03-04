@@ -9,20 +9,28 @@ const alarm = sequelize.define('alarms',{
         allowNull: false,
         autoIncrement: true
     },
-    hour:{
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    minute:{
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
     name:{
         type: DataTypes.TEXT,
         allowNull: false
     },
     active:{
         type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    frecuencia:{
+        type:DataTypes.INTEGER,
+        allowNull: false
+    }, 
+    cantidad:{
+        type:DataTypes.INTEGER,
+        allowNull: false
+    },
+    dias:{
+        type:DataTypes.INTEGER,
+        allowNull: false
+    },
+    fecha_inicio:{
+        type:DataTypes.DATE,
         allowNull: false
     }
 },{

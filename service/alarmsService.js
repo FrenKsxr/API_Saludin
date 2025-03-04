@@ -10,24 +10,25 @@ class alarmsService{
         return alarm.findByPk(Id);
     }
 
-    async crearAlarm(newAlarm){
+    async crearAlarm(newAlarm) {
+        newAlarm.fecha_inicio = new Date(newAlarm.fecha_inicio);
         return alarm.create(newAlarm);
     }
 
-    async actualizarAlarm(Id,newdata){
-        const newalarm = await alarm.findByPk(Id);
-        if(newalarm){
-            const update= await alarm.update(newdata,{
-                where: {id:Id}
-            });
-            if (update > 0){
-                return alarm.findByPk(Id)
-            };
+    async actualizarAlarm(Id, newData) {
+        const existingAlarm = await alarm.findByPk(Id);
+        if (!existingAlarm) {
+            console.log('La alarma no existe.');
+            return null;
         }
 
-        console.log('No se dio plebi, fak :(');
-    }
+        if (newData.fecha_inicio) {
+            newData.fecha_inicio = new Date(newData.fecha_inicio);
+        }
 
+        await alarm.update(newData, { where: { id: Id } });
+        return alarm.findByPk(Id); 
+    }
     async eliminarAlarm(Id){
         const alarms = await alarm.findByPk(Id);
         if (alarms) {

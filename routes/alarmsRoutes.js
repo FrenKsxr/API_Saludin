@@ -13,32 +13,43 @@ const controller = new alarmController(service)
  *     Alarm:
  *       type: object
  *       required:
- *         - hour
- *         - minute
  *         - name
  *         - active
+ *         - frecuencia
+ *         - cantidad
+ *         - dias
+ *         - fecha_inicio
  *       properties:
  *         id:
  *           type: integer
  *           description: ID único de la alarma (autoincremental)
- *         hour:
- *           type: integer
- *           description: Hora de la alarma (0-23)
- *         minute:
- *           type: integer
- *           description: Minuto de la alarma (0-59)
  *         name:
  *           type: string
  *           description: Nombre de la alarma
  *         active:
  *           type: integer
  *           description: 1 si está activa, 0 si está inactiva
+ *         frecuencia:
+ *           type: integer
+ *           description: Frecuencia en horas con la que se repite la alarma
+ *         cantidad:
+ *           type: integer
+ *           description: Cantidad de dosis asociadas a la alarma
+ *         dias:
+ *           type: integer
+ *           description: Número de días que durará la alarma activa
+ *         fecha_inicio:
+ *           type: string
+ *           format: date
+ *           description: Fecha de inicio de la alarma (YYYY-MM-DD)
  *       example:
  *         id: 1
- *         hour: 8
- *         minute: 30
  *         name: "Despertar"
  *         active: 1
+ *         frecuencia: 8
+ *         cantidad: 2
+ *         dias: 3
+ *         fecha_inicio: "2024-03-01"
  */
 
 /**
