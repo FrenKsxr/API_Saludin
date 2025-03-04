@@ -3,6 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const twilio = require('twilio');
 require('dotenv').config();
 
+
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
@@ -10,7 +11,7 @@ app.use(express.static('public'));
 const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 const PHONE_NUMBER = process.env.PHONE_NUMBER;
 
-const db = new sqlite3.Database(':memory:');
+const db = new sqlite3.Database('alarms.db');
 db.serialize(() => {
   db.run('CREATE TABLE alarms (id INTEGER PRIMARY KEY AUTOINCREMENT, hour INTEGER, minute INTEGER, name TEXT, active INTEGER)');
 });
@@ -27,7 +28,7 @@ app.get('/api/alarms', (req, res) => {
   db.all('SELECT * FROM alarms', (err, rows) => {
     if (err) return res.status(500).send(err);
     res.json(rows.map(row => ({
-      id: row.id,
+      id: row.id, 
       hour: row.hour,
       minute: row.minute,
       name: row.name,
