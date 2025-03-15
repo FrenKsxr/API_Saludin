@@ -4,6 +4,8 @@ const cors = require('cors')
 const env = require('dotenv').config();
 require('./middlewareXXX/cronjob'); // Importa el archivo con el cron job
 const { sendWhatsAppMessage } = require('./middlewareXXX/whasa'); 
+const whats = require('./middlewareXXX/whasa');
+const whatsapp = require('./routes/whasaRoutes')
 
 /*rutas*/
 const alarms = require('./routes/alarmsRoutes')
@@ -17,6 +19,9 @@ app.use(express.json());
 
 app.use("/docs", swaggerUI.serve,swaggerUI.setup(specs))
 app.use('/', alarms)
+/*app.use('/whatsapp', whats);*/
+app.use('/', whatsapp)
+
 
 app.use(express.json());
 
