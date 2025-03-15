@@ -129,7 +129,7 @@ cron.schedule('* * * * *', async () => {
             const diffMinutes = Math.floor((now - startDate) / (1000 * 60)); // Diferencia en minutos desde el inicio
 
             if (diffMinutes % frecuenciaMinutos === 0) {
-                sendWhatsAppMessage('529141322309@c.us', `¡Es hora de tomar tu pastilla! 💊 - ${alarm.name}`);
+                sendWhatsAppMessage('529995763974@c.us', `¡Es hora de tomar tu pastilla! 💊 - ${alarm.name}`);
                 console.log(`📩 Mensaje enviado para la alarma: ${alarm.name}`);
             }
         }
