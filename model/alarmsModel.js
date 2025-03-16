@@ -18,7 +18,7 @@ const alarm = sequelize.define('alarms',{
         allowNull: false
     },
     frecuencia:{
-        type:DataTypes.INTEGER,
+        type:DataTypes.STRING,
         allowNull: false
     }, 
     cantidad:{
@@ -32,6 +32,9 @@ const alarm = sequelize.define('alarms',{
     fecha_inicio:{
         type:DataTypes.DATE,
         allowNull: false
+    },
+    hora_inicio:{
+        type: DataTypes.TIME,
     }
 },{
     tableName: 'alarms',

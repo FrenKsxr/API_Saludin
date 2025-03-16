@@ -30,8 +30,9 @@ const controller = new alarmController(service)
  *           type: integer
  *           description: 1 si está activa, 0 si está inactiva
  *         frecuencia:
- *           type: integer
- *           description: Frecuencia en horas con la que se repite la alarma
+ *           type: string
+ *           format: time
+ *           description: Frecuencia en horas con la que se repite la alarma (HH:MM)
  *         cantidad:
  *           type: integer
  *           description: Cantidad de dosis asociadas a la alarma
@@ -42,14 +43,19 @@ const controller = new alarmController(service)
  *           type: string
  *           format: date
  *           description: Fecha de inicio de la alarma (YYYY-MM-DD)
+ *         hora_inicia: 
+ *           type: string
+ *           format: time
+ *           description: Hora de Inicio de las pastillas (HH:MM)
  *       example:
  *         id: 1
- *         name: "Despertar"
+ *         name: "Oxycontin"
  *         active: 1
- *         frecuencia: 8
+ *         frecuencia: "00:30"
  *         cantidad: 2
  *         dias: 3
  *         fecha_inicio: "2024-03-01"
+ *         hora_inicio: "12:30"
  */
 
 /**

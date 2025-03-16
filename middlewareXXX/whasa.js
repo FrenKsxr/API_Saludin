@@ -1,23 +1,41 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode');
 const express = require('express');
-const router = express.Router();  // Asegúrate de que sea un router de Express
-let qrCodeBase64 = null; // Variable para almacenar el QR en base64
+const router = express.Router();
 
-const client = new Client({
-    authStrategy: new LocalAuth()
-});
+let qrCodeBase64 = null;
+let client = null;
 
-// Generar el QR y guardarlo en base64
-client.on('qr', async qr => {
-    console.log('Escanea este código QR con tu WhatsApp:');
-    qrCodeBase64 = await qrcode.toDataURL(qr); // Guardar QR como base64
-});
+// Función para inicializar el cliente
+const initializeClient = () => {
+    client = new Client({
+        authStrategy: new LocalAuth()
+    });
 
-// Confirmar que el bot está listo
-client.on('ready', () => {
-    console.log('✅ Bot de WhatsApp está listo!');
-});
+    // Generar el QR y guardarlo en base64
+    client.on('qr', async qr => {
+        console.log('Escanea este código QR con tu WhatsApp:');
+        qrCodeBase64 = await qrcode.toDataURL(qr); // Guardar QR como base64
+    });
+
+    // Confirmar que el bot está listo
+    client.on('ready', () => {
+        console.log('✅ Bot de WhatsApp está listo!');
+    });
+
+    // Manejar la desconexión
+    client.on('disconnected', (reason) => {
+        console.log('🚫 Cliente desconectado:', reason);
+        qrCodeBase64 = null; // Limpiar el QR anterior
+        client.initialize(); // Reiniciar el cliente para generar un nuevo QR
+    });
+
+    // Inicialización del cliente
+    client.initialize();
+};
+
+// Inicializar el cliente al cargar el módulo
+initializeClient();
 
 // Endpoint para obtener el QR en base64
 router.get('/whatsapp/qr', (req, res) => {
@@ -27,8 +45,22 @@ router.get('/whatsapp/qr', (req, res) => {
     res.json({ qr: qrCodeBase64 });
 });
 
-// Inicialización del cliente
-client.initialize();
+// Endpoint para reiniciar el QR
+router.post('/whatsapp/reset', async (req, res) => {
+    try {
+        if (client) {
+            await client.logout(); // Cerrar la sesión actual
+            console.log('✅ Sesión de WhatsApp cerrada. Reiniciando...');
+            initializeClient(); // Reiniciar el cliente
+            res.json({ message: 'Sesión reiniciada. Escanea el nuevo QR.' });
+        } else {
+            res.status(400).json({ error: 'Cliente no inicializado' });
+        }
+    } catch (error) {
+        console.error('🚨 Error al reiniciar la sesión:', error);
+        res.status(500).json({ error: 'Error al reiniciar la sesión' });
+    }
+});
 
 // Función para enviar un mensaje de WhatsApp
 const sendWhatsAppMessage = async (number, message) => {

@@ -95,7 +95,7 @@ console.log('⏰ Cron job de alarmas activado...');
 */
 
 /*/*//////*/*/*/*/*/*/*/*/
-
+/*
 const { sendWhatsAppMessage } = require('./whasa');
 const cron = require('node-cron');
 const alarmsService = require('../service/alarmsService');
@@ -138,3 +138,60 @@ cron.schedule('* * * * *', async () => {
 
 console.log('⏰ Cron job de alarmas activado...');
 
+*/
+
+/*PRUEBA FINAL SI QUEDAAA*/
+
+const { sendWhatsAppMessage } = require('./whasa');
+const cron = require('node-cron');
+const alarmsService = require('../service/alarmsService');
+
+const alarmService = new alarmsService();
+
+// Función para convertir HH:MM a minutos
+function convertirFrecuenciaAMinutos(frecuencia) {
+    const [horas, minutos] = frecuencia.split(':').map(Number);
+    return horas * 60 + minutos;
+}
+
+// Programar el cron job cada minuto para revisar alarmas activas
+cron.schedule('* * * * *', async () => {
+    const now = new Date(); // Obtener la hora actual
+    const alarms = await alarmService.obtenerAlarm(); // Obtener todas las alarmas
+
+    alarms.forEach(async (alarm) => {
+        if (alarm.active === 1) { // Solo procesar alarmas activas
+            const startDate = new Date(alarm.fecha_inicio);
+            const startTime = new Date(startDate); // Fecha y hora de inicio
+
+            // Convertir hora_inicio a un objeto Date
+            const [hora, minutos] = alarm.hora_inicio.split(':').map(Number);
+            startTime.setHours(hora, minutos, 0, 0); // Establecer la hora de inicio
+
+            // Calcular la fecha de finalización
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + alarm.dias); // Sumar los días de duración
+
+            // Si la fecha actual supera el tiempo de tratamiento, desactivar la alarma
+            if (now >= endDate) {
+                await alarmService.actualizarAlarm(alarm.id, { active: 0 });
+                console.log(`⏳ Alarma ${alarm.name} desactivada automáticamente.`);
+                return; // Salir de la función para evitar el envío de mensaje
+            }
+
+            // Convertir frecuencia a minutos
+            const frecuenciaMinutos = convertirFrecuenciaAMinutos(alarm.frecuencia);
+
+            // Calcular la diferencia en minutos desde la hora de inicio
+            const diffMinutes = Math.floor((now - startTime) / (1000 * 60));
+
+            // Verificar si es momento de enviar el mensaje
+            if (diffMinutes >= 0 && diffMinutes % frecuenciaMinutos === 0) {
+                sendWhatsAppMessage('529995763974@c.us', `¡Es hora de tomar tu pastilla! 💊 - ${alarm.name}`);
+                console.log(`📩 Mensaje enviado para la alarma: ${alarm.name}`);
+            }
+        }
+    });
+});
+
+console.log('⏰ Cron job de alarmas activado...');
