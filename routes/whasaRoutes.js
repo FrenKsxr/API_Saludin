@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { generateQR } = require('../controller/whatsappController');
+const {client} = require('../middlewareXXX/whasa')
 
 /**
  * @swagger
